@@ -19,7 +19,13 @@ const Client = new mongoose.Schema({
             required: true
         }
     },
-    nip: String
+    nip: String,
+
+    actions: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Action"
+    }]
+
 }, 
 {timestamps: true}
 )
