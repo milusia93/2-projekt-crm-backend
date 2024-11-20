@@ -16,7 +16,7 @@ module.exports = () => {
     router.get('/', ActionsController.index)
 
      // GET /actions/:id
-     router.get('/:id', ActionsController.client)
+     router.get('/:id', ActionsController.action)
 
     return router
 }

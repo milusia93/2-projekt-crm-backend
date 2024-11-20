@@ -1,4 +1,5 @@
 const ActionModel = require("../models/ActionModel");
+const ClientModel = require("../models/ClientModel");
 
 module.exports = {
     index: (_req, res) => {
@@ -30,9 +31,9 @@ module.exports = {
       create: (req, res) => {
         const action = new ActionModel({
             date: req.body.date,
-            actionType: req.body.actiontype,
+            actionType: req.body.actionType,
             description: req.body.description,
-            // specificClient: req.body.specificClient,
+            specificClient: req.body.specificClient,
         });
         // const client = req.body
         // res.send(JSON.stringify(client))
