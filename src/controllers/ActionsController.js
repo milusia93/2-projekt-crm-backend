@@ -41,6 +41,7 @@ module.exports = {
           .save()
           .then(() => {
             res.status(201).send(action);
+            ClientModel.updateOne({_id: req.body.specificClient}, {$push: {actions: action._id}})
           })
           .catch((err) => {
             res.status(500).json({
