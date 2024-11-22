@@ -18,8 +18,6 @@ module.exports = {
       address: req.body.address,
       nip: req.body.nip,
     });
-    // const client = req.body
-    // res.send(JSON.stringify(client))
     client
       .save()
       .then(() => {
