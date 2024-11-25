@@ -77,6 +77,7 @@ module.exports = {
 
   client: (req, res) => {
     ClientModel.findById(req.params.id)
+      .populate("actions")
       .then((client) => {
         res.status(200).json(client);
       })

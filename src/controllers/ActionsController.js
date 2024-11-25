@@ -57,6 +57,12 @@ module.exports = {
     ActionModel.findByIdAndDelete(req.params.id)
       .then((deletedAction) => {
         if (deletedAction) {
+          ClientModel.updateOne(
+            { _id: req.body.specificClient },
+            { $pull: { actions: req.params.id} }
+          ).catch((err) => {
+            res.json(err);
+          });
           res.status(200).json({ deleted: true });
         } else {
           res.status(404).json({
