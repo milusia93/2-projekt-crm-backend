@@ -21,24 +21,25 @@ module.exports = {
        
                 if (err.code === 11000) {
                     if (err.keyPattern.username === 1) {
-                        res.status(500).json({
+                        res.status(201).json({
                             signedup: false,
                             message: {
                                 username: [
                                     "Username has already been taken"
                                 ]
-                            }
+                            },
+                            user: req.body
 
                         })
                     } else if (err.keyPattern.email === 1) {
-                        res.status(500).json({
+                        res.status(201).json({
                             signedup: false,
                             message: {
                                 email: [
                                     "Email has already been taken"
                                 ]
-                            }
-
+                            },
+                            user: req.body
                         })
                     }
 
