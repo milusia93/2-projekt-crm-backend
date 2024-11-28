@@ -1,4 +1,5 @@
 const ClientModel = require("../models/ClientModel");
+const ActionModel = require("../models/ActionModel");
 module.exports = {
   index: (_req, res) => {
     ClientModel.find()
@@ -35,6 +36,12 @@ module.exports = {
     ClientModel.findByIdAndDelete(req.params.id)
       .then((deletedClient) => {
         if (deletedClient) {
+          console.log(deletedClient)
+          ActionModel.deleteMany(
+            { specificClient: deletedClient._id },
+          ).catch((err) => {
+            res.json(err);
+          });
           res.status(200).json({ deleted: true });
         } else {
           res.status(404).json({

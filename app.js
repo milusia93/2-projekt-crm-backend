@@ -4,6 +4,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const clientRoutes = require('./src/routes/ClientsRoutes')()
 const actionRoutes = require('./src/routes/ActionsRoutes')()
+const userRoutes = require('./src/routes/UsersRoutes')()
 const mongoUrl = `mongodb://${config.db.host}:${config.db.port}/${config.db.name}`
 const app = express();
 
@@ -21,6 +22,8 @@ app.use(cors());
 
 app.use('/clients', clientRoutes);
 app.use('/actions', actionRoutes);
+app.use('/users', userRoutes);
+
 
 app.listen(config.app.port, ()=>{
     console.log('server is up')
