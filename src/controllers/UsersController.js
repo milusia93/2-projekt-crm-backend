@@ -18,27 +18,19 @@ module.exports = {
                 });
             })
             .catch((err) => {
-       
+
                 if (err.code === 11000) {
                     if (err.keyPattern.username === 1) {
-                        res.status(201).json({
-                            signedup: false,
-                            message: {
-                                username: [
-                                    "Username has already been taken"
-                                ]
-                            },
+                        res.status(409).json({
+                            error: true,
+                            message: "Username has already been taken",
                             user: req.body
 
                         })
                     } else if (err.keyPattern.email === 1) {
-                        res.status(201).json({
-                            signedup: false,
-                            message: {
-                                email: [
-                                    "Email has already been taken"
-                                ]
-                            },
+                        res.status(409).json({
+                            error: true,
+                            message: "Email has already been taken",
                             user: req.body
                         })
                     }
@@ -49,5 +41,52 @@ module.exports = {
                     })
                 }
             });
+    },
+    login: (req, res) => {
+        UserModel.findOne({ username: req.body.username })
+            .then((user) => {
+                if (!user) {
+                    res.status(404).json({
+                        error: true,
+                        message: "User does not exist",
+                        user: req.body
+                    })
+                    return
+                }
+   
+                bcrypt.compare(req.body.password, user.password, (err, logged) => {
+                    if (err) {
+                        res.status(409).json({
+                            error: true,
+                            message: "Login error",
+                            user: {username: req.body.username, password: ""}
+                        })
+                        return;
+                    }
+
+                    if (logged) {
+                        // const token = user.generateAuthToken(user);
+                        // res.cookie("AuthToken", token);
+                        console.log('Loged in')
+                        res.status(201).json({
+                            error: false,
+                            message: "User is loged in",
+                            user: req.body
+                        })
+                    } else {
+                        res.status(409).json({
+                            error: true,
+                            message: "Login data do not match",
+                            user: {username: req.body.username, password: ""}
+                        })
+                    }
+                })
+            })
+            .catch((err) => {
+                return res.status(500).json({
+                    message: "Error while loging in",
+                    error: err,
+                });
+            })
     }
 }
