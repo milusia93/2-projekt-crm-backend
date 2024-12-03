@@ -1,4 +1,6 @@
 const UserModel = require("../models/UserModel");
+const bcrypt = require('bcrypt');
+const cookieParser = require('cookie-parser')
 module.exports = {
     create: (req, res) => {
         const newUser = new UserModel({
@@ -53,7 +55,8 @@ module.exports = {
                     })
                     return
                 }
-   
+        
+
                 bcrypt.compare(req.body.password, user.password, (err, logged) => {
                     if (err) {
                         res.status(409).json({
@@ -65,12 +68,12 @@ module.exports = {
                     }
 
                     if (logged) {
-                        // const token = user.generateAuthToken(user);
-                        // res.cookie("AuthToken", token);
-                        console.log('Loged in')
+                        const token = user.generateAuthToken(user);
+                        res.cookie("AuthToken", token);
+                        // console.log('Loged in')
                         res.status(201).json({
-                            error: false,
-                            message: "User is loged in",
+                            logedin: true,
+                            message: "You successfully logged in",
                             user: req.body
                         })
                     } else {
@@ -79,6 +82,7 @@ module.exports = {
                             message: "Login data do not match",
                             user: {username: req.body.username, password: ""}
                         })
+                        return;
                     }
                 })
             })
