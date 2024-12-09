@@ -1,6 +1,6 @@
 const UserModel = require("../models/UserModel");
 const bcrypt = require('bcrypt');
-const cookieParser = require('cookie-parser')
+
 module.exports = {
     create: (req, res) => {
         const newUser = new UserModel({
@@ -24,16 +24,29 @@ module.exports = {
                 if (err.code === 11000) {
                     if (err.keyPattern.username === 1) {
                         res.status(409).json({
-                            error: true,
-                            message: "Username has already been taken",
-                            user: req.body
+                            signedup: false,
+                            message: {
+                                username: [
+                                    "Username has already been taken"
+                                ]
+                            }
+                            // error: true,
+                            // message: "Username has already been taken",
+                            // user: req.body
 
                         })
                     } else if (err.keyPattern.email === 1) {
                         res.status(409).json({
-                            error: true,
-                            message: "Email has already been taken",
-                            user: req.body
+                            signedup: false,
+                            message: {
+                                email: [
+                                    "Email has already been taken"
+                                ]
+                            }
+
+                            // error: true,
+                            // message: "Email has already been taken",
+                            // user: req.body
                         })
                     }
 
@@ -48,10 +61,10 @@ module.exports = {
         UserModel.findOne({ username: req.body.username })
             .then((user) => {
                 if (!user) {
-                    res.status(404).json({
+                    res.status(409).json({
                         error: true,
                         message: "User does not exist",
-                        user: req.body
+                        user: {username: req.body.username}
                     })
                     return
                 }
@@ -59,28 +72,25 @@ module.exports = {
 
                 bcrypt.compare(req.body.password, user.password, (err, logged) => {
                     if (err) {
-                        res.status(409).json({
+                        res.status(500).json({
                             error: true,
                             message: "Login error",
-                            user: {username: req.body.username, password: ""}
                         })
                         return;
                     }
 
                     if (logged) {
                         const token = user.generateAuthToken(user);
-                        res.cookie("AuthToken", token);
-                        // console.log('Loged in')
-                        res.status(201).json({
-                            logedin: true,
+                        res.status(200).json({
+                            username: user.username, 
                             message: "You successfully logged in",
-                            user: req.body
+                            jwt: token
                         })
                     } else {
-                        res.status(409).json({
+                        res.status(400).json({
                             error: true,
                             message: "Login data do not match",
-                            user: {username: req.body.username, password: ""}
+                            user: {username: req.body.username}
                         })
                         return;
                     }
@@ -92,5 +102,13 @@ module.exports = {
                     error: err,
                 });
             })
+    },
+    logout: (req,res) => {
+        res.status(200).json({
+            message: "User loged out"
+        })
+        if (err) {
+            console.error(err)
+        }
     }
 }

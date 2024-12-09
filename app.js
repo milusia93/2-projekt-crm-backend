@@ -18,12 +18,13 @@ mongoose
         throw err
     })
 
+const AuthMiddleware = require("./src/middlewares/AuthMiddleware");    
 app.use(express.json())
 app.use(cors());
 app.use(cookieParser())
 
-app.use('/clients', clientRoutes);
-app.use('/actions', actionRoutes);
+app.use('/clients',AuthMiddleware, clientRoutes);
+app.use('/actions',AuthMiddleware, actionRoutes);
 app.use('/users', userRoutes);
 
 
