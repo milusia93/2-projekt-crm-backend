@@ -1,17 +1,44 @@
 const ClientModel = require("../models/ClientModel");
 const ActionModel = require("../models/ActionModel");
 module.exports = {
-  index: (_req, res) => {
-    ClientModel.find()
-      .then((clients) => {
-        res.status(200).send(clients);
-      })
-      .catch((err) => {
-        return res.status(500).json({
-          message: "Error while fetching clients",
-          error: err,
-        });
-      });
+  index: async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 3;
+
+    const startIndex = (page - 1) * limit;
+    const total = await ClientModel.countDocuments();
+
+    const clients = await ClientModel.find().skip(startIndex).limit(limit);
+
+    res.json({
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
+        data: clients
+    });
+    // const page = parseInt(req.query.page) || 1;
+    // const limit = parseInt(req.query.limit) || 3;
+
+    // const startIndex = (page - 1) * limit;
+    // const total = ClientModel.countDocuments();
+
+    // ClientModel.find().skip(startIndex).limit(limit)
+    //   .then((clients) => {
+    //     res.status(200).json({
+    //       page,
+    //       limit,
+    //       total,
+    //       pages: Math.ceil(total / limit),
+    //       data: clients
+    //     })
+    //   })
+    //   .catch((err) => {
+    //     return res.status(500).json({
+    //       message: "Error while fetching clients",
+    //       error: err,
+    //     });
+    //   });
   },
   create: (req, res) => {
     const client = new ClientModel({

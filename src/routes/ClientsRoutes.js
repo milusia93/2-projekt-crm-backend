@@ -15,8 +15,10 @@ module.exports = () => {
     // GET /clients
     router.get('/', ClientsController.index)
 
-     // GET /clients/:id
-     router.get('/:id', ClientsController.client)
+    // GET /clients/:id
+    router.get('/:id', ClientsController.client)
+
+    
 
     return router
 }
