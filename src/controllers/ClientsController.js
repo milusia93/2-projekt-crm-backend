@@ -4,41 +4,46 @@ module.exports = {
   index: async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 3;
+    const sortingDirection = req.query.direction;
+    const sortingCategory =req.query.category 
+
+    
+    const sortMethods = {
+      none: { method: 1},
+      ascending: { method: 1 },
+      descending: { method: -1 },
+    };
 
     const startIndex = (page - 1) * limit;
     const total = await ClientModel.countDocuments();
 
-    const clients = await ClientModel.find().skip(startIndex).limit(limit);
+    console.log(req.query)
 
-    res.json({
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit),
-        data: clients
-    });
+    ClientModel.find()
+      .skip(startIndex)
+      .limit(limit)
+      .sort({[sortingCategory] : sortMethods[sortingDirection].method })
+      .then((clients) => {
+        res.status(200).json({
+          page,
+          limit,
+          total,
+          pages: Math.ceil(total / limit),
+          data: clients,
+        });
+      })
+      .catch((err) => {
+        return res.status(500).json({
+          message: "Error while fetching clients",
+          error: err,
+        });
+      });
+
     // const page = parseInt(req.query.page) || 1;
     // const limit = parseInt(req.query.limit) || 3;
 
     // const startIndex = (page - 1) * limit;
     // const total = ClientModel.countDocuments();
-
-    // ClientModel.find().skip(startIndex).limit(limit)
-    //   .then((clients) => {
-    //     res.status(200).json({
-    //       page,
-    //       limit,
-    //       total,
-    //       pages: Math.ceil(total / limit),
-    //       data: clients
-    //     })
-    //   })
-    //   .catch((err) => {
-    //     return res.status(500).json({
-    //       message: "Error while fetching clients",
-    //       error: err,
-    //     });
-    //   });
   },
   create: (req, res) => {
     const client = new ClientModel({
@@ -63,12 +68,12 @@ module.exports = {
     ClientModel.findByIdAndDelete(req.params.id)
       .then((deletedClient) => {
         if (deletedClient) {
-          console.log(deletedClient)
-          ActionModel.deleteMany(
-            { specificClient: deletedClient._id },
-          ).catch((err) => {
-            res.json(err);
-          });
+          console.log(deletedClient);
+          ActionModel.deleteMany({ specificClient: deletedClient._id }).catch(
+            (err) => {
+              res.json(err);
+            }
+          );
           res.status(200).json({ deleted: true });
         } else {
           res.status(404).json({
